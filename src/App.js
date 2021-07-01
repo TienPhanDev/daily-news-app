@@ -1,9 +1,20 @@
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 /* eslint-disable func-names */
-/* eslint-disable prefer-arrow-callback */
 import * as React from 'react';
 import './App.css';
+
+const useCustomHook = () => {
+  const [searchTerm, setSearchTerm] = React.useState(
+    localStorage.getItem('search') || '',
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem('search', searchTerm);
+  }, [searchTerm]);
+
+  return [searchTerm, setSearchTerm]
+};
 
 const App = () => {
   const stories = [
@@ -25,7 +36,7 @@ const App = () => {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchTerm, setSearchTerm] = useCustomHook();
 
   const handleSearch = event => {
     setSearchTerm(event.target.value);
@@ -39,7 +50,6 @@ const App = () => {
     <div className="grid mx-auto px-4 mt-5">
       <div className="mx-auto p-6 text-xl border border-solid border-blue-500">
         My Daily News App
-        {console.log(`${firstName} has a pet called ${name}`)}
       </div>
       <div className="mx-auto p-4">
         <Search onSearch={handleSearch} search={searchTerm} />
@@ -51,30 +61,25 @@ const App = () => {
   );
 };
 
-const Search = ({ search, onSearch }) => {
+const Search = ({ search, onSearch }) => (
   <div className="p-4 mx-auto">
     <label htmlFor="search">Search: </label>
     <input id="search" type="text" value={search} onChange={onSearch} />
-  </div>;
-};
-
-const List = ({ list }) => (
-  <ul>
-    {list.map(item => (
-      <Item key={item.objectID} title={item.title} url={item.url} author={item.author} num_comments={item.num_comments} points={item.points} />
-    ))}
-  </ul>
+  </div>
 );
 
-const Item = ({ title, url, author, num_comments, points }) => (
-  <li>
+const List = ({ list }) =>
+  list.map(item => <Item key={item.objectID} {...item} />);
+
+const Item = ({ title, url, author, numComments, points }) => (
+  <div>
     <div>
       {author}
       <a href={url}>{title}</a>
     </div>
-    <div>{num_comments}</div>
+    <div>{numComments}</div>
     <div>{points}</div>
-  </li>
+  </div>
 );
 
 export default App;
